@@ -53,12 +53,16 @@ export async function login({ email, password }) {
   }
 }
 
-export async function createPost({ content, file }) {
+export async function createPost({ content, files }) {
   try {
     const formData = new FormData();
     formData.append("content", content);
-    if (file) {
-      formData.append("file", file);
+
+    // Handle multiple files
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        formData.append("files", file); // Sesuai dengan API yang mengharapkan 'files'
+      });
     }
 
     const response = await fetch(ENDPOINTS.POSTS, {
@@ -96,6 +100,7 @@ export async function getAllPosts(page = 1) {
   }
 }
 
+// src/utils/api.js
 export async function deletePost(postId) {
   try {
     const response = await fetch(`${ENDPOINTS.POSTS}/${postId}`, {
