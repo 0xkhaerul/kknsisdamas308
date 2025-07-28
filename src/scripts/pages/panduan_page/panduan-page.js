@@ -225,7 +225,7 @@ export default class LogbookPage {
     return this.selectedPhotos;
   }
 
-  createPostElement(post) {
+   createPostElement(post) {
     // Limit tampilan foto maksimal 3
     const maxDisplayPhotos = 3;
     const totalPhotos = post.images ? post.images.length : 0;
@@ -240,7 +240,7 @@ export default class LogbookPage {
     );
 
     return `
-      <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 post-item" data-id="${
+      <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 pr-8 post-item" data-id="${
         post.id
       }">
         <div class="flex items-start space-x-4">
@@ -267,9 +267,10 @@ export default class LogbookPage {
                 </svg>
               </button>
             </div>
-          <p class="mt-3 text-gray-700 post-content" data-full-content="${encodeURIComponent(
-            post.content
-          )}">
+         <p class="mt-3 text-gray-700 prose prose-sm text-justify post-content" data-full-content="${encodeURIComponent(
+           post.content
+         )}">
+
             ${this.convertMarkdown(visibleContent)}
             ${
               isTruncated
@@ -323,7 +324,7 @@ export default class LogbookPage {
       </div>
     `;
   }
-
+  
   // Method untuk membuat modal photo viewer
   createPhotoModal() {
     const modalHTML = `
