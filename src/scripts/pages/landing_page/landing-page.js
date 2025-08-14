@@ -15,7 +15,7 @@ export default class LandingPage {
               KKN SISDAMAS 308
             </h1>
             <p class="text-xl md:text-2xl text-gray-600 mb-4 max-w-4xl mx-auto leading-relaxed">
-              Kuliah Kerja Nyata Universitas [Nama Universitas]
+              Kuliah Kerja Nyata Universitas Islam Negeri Sunan Gunung Djati Bandung, Program Sistem Pemberdayaan Masyarakat Melalui Pengabdian Mahasiswa
             </p>
             <p class="text-lg text-gray-500 mb-12 max-w-3xl mx-auto">
               Membangun desa, mengembangkan masyarakat, dan menciptakan perubahan positif melalui pengabdian mahasiswa
@@ -23,11 +23,11 @@ export default class LandingPage {
             <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <button class="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-2xl shadow-lg">
                 <i class="fas fa-play-circle mr-2"></i>
-                Lihat Program Kami
+                Lihat Logbook Kami
               </button>
               <button class="px-8 py-4 border-2 border-blue-500 text-blue-500 font-semibold rounded-2xl">
                 <i class="fas fa-users mr-2"></i>
-                Bergabung Sekarang
+                Tentang Sisdamas
               </button>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default class LandingPage {
       <section class="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
         <div class="container mx-auto max-w-6xl">
           <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Program Unggulan</h2>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Proker Pilihan</h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
               Berbagai program inovatif untuk pemberdayaan masyarakat dan pengembangan desa
             </p>
@@ -85,7 +85,7 @@ export default class LandingPage {
               <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6">
                 <i class="fas fa-seedling text-white text-xl"></i>
               </div>
-              <h3 class="text-2xl font-bold text-gray-800 mb-4">Pertanian Berkelanjutan</h3>
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">Pendidikan</h3>
               <p class="text-gray-600 mb-6 leading-relaxed">
                 Program pengembangan sistem pertanian modern dan ramah lingkungan untuk meningkatkan produktivitas petani lokal.
               </p>
@@ -99,7 +99,7 @@ export default class LandingPage {
               <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6">
                 <i class="fas fa-laptop-code text-white text-xl"></i>
               </div>
-              <h3 class="text-2xl font-bold text-gray-800 mb-4">Digital Village</h3>
+              <h3 class="text-2xl font-bold text-gray-800 mb-4">Sampah</h3>
               <p class="text-gray-600 mb-6 leading-relaxed">
                 Transformasi digital desa melalui pelatihan teknologi, pembuatan website desa, dan sistem informasi terpadu.
               </p>
@@ -182,60 +182,82 @@ export default class LandingPage {
       </section>
 
       <!-- Testimonial Section -->
-      <section class="py-20 px-4 bg-gradient-to-br from-blue-50 to-green-50">
+        <section class="py-20 px-4 bg-gradient-to-br from-blue-50 to-green-50">
         <div class="container mx-auto max-w-6xl">
           <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Testimoni</h2>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+              Dosen Pembimbing Lapangan
+            </h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
               Suara dari masyarakat dan mahasiswa yang telah merasakan manfaat program KKN
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-8 rounded-3xl shadow-xl">
-              <div class="flex items-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-4">
-                  <i class="fas fa-user text-white text-xl"></i>
-                </div>
-                <div>
-                  <h4 class="font-bold text-gray-800">Pak Suyanto</h4>
-                  <p class="text-gray-600">Kepala Desa Sukamaju</p>
+          <!-- Foto di tengah -->
+          <div class="flex justify-center items-center">
+            <img 
+              src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+              alt="Foto DPL" 
+              class="rounded-2xl shadow-lg w-100 h-100 object-cover"
+            >
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- Testimonial Section -->
+      <section class="py-20 px-4 bg-gradient-to-br from-blue-50 to-green-50">
+        <div class="container mx-auto max-w-6xl">
+          <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Anggota</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+              Suara dari masyarakat dan mahasiswa yang telah merasakan manfaat program KKN
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="relative group cursor-pointer">
+              <div class="aspect-square bg-gradient-to-br from-blue-200 to-blue-300 rounded-3xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center">
+                  <i class="fas fa-image text-6xl text-blue-600"></i>
                 </div>
               </div>
-              <div class="mb-4">
-                <div class="flex text-yellow-400 mb-3">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
+              <div class="absolute inset-0 bg-black/50 rounded-3xl opacity-0 flex items-center justify-center">
+                <div class="text-center text-white">
+                  <i class="fas fa-search-plus text-3xl mb-2"></i>
+                  <p class="font-semibold">Kegiatan Pertanian</p>
                 </div>
-                
               </div>
             </div>
 
-            <div class="bg-white p-8 rounded-3xl shadow-xl">
-              <div class="flex items-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mr-4">
-                  <i class="fas fa-user-graduate text-white text-xl"></i>
-                </div>
-                <div>
-                  <h4 class="font-bold text-gray-800">Sarah Permata</h4>
-                  <p class="text-gray-600">Mahasiswa Teknik Informatika</p>
+            <div class="relative group cursor-pointer">
+              <div class="aspect-square bg-gradient-to-br from-green-200 to-green-300 rounded-3xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center">
+                  <i class="fas fa-image text-6xl text-green-600"></i>
                 </div>
               </div>
-              <div class="mb-4">
-                <div class="flex text-yellow-400 mb-3">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
+              <div class="absolute inset-0 bg-black/50 rounded-3xl opacity-0 flex items-center justify-center">
+                <div class="text-center text-white">
+                  <i class="fas fa-search-plus text-3xl mb-2"></i>
+                  <p class="font-semibold">Pelatihan Digital</p>
                 </div>
-     
               </div>
             </div>
-          </div>
+
+            <div class="relative group cursor-pointer">
+              <div class="aspect-square bg-gradient-to-br from-purple-200 to-purple-300 rounded-3xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center">
+                  <i class="fas fa-image text-6xl text-purple-600"></i>
+                </div>
+              </div>
+              <div class="absolute inset-0 bg-black/50 rounded-3xl opacity-0 flex items-center justify-center">
+                <div class="text-center text-white">
+                  <i class="fas fa-search-plus text-3xl mb-2"></i>
+                  <p class="font-semibold">Workshop UMKM</p>
+                </div>
+              </div>
+            </div>
         </div>
       </section>
 
@@ -244,16 +266,13 @@ export default class LandingPage {
         <div class="container mx-auto max-w-4xl text-center">
           <div class="animate-on-scroll opacity-0 translate-y-10">
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
-              Bergabunglah dengan KKN!
+             KKN SISDAMAS!
             </h2>
             <p class="text-xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
               Mari bersama-sama membangun Indonesia melalui pengabdian dan dedikasi. Daftarkan diri Anda sekarang dan jadilah bagian dari perubahan positif.
             </p>
             <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button class="px-10 py-4 bg-white text-blue-600 font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <i class="fas fa-user-plus mr-2"></i>
-                Daftar Sekarang
-              </button>
+              
               <button class="px-10 py-4 border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300">
                 <i class="fas fa-info-circle mr-2"></i>
                 Info Lebih Lanjut
@@ -279,7 +298,7 @@ export default class LandingPage {
               <h4 class="text-white font-bold mb-4">Program</h4>
               <ul class="space-y-2 text-sm">
                 <li><a href="#" class="hover:text-blue-400 transition-colors">Pertanian</a></li>
-                <li><a href="#" class="hover:text-blue-400 transition-colors">Digital Village</a></li>
+                <li><a href="#" class="hover:text-blue-400 transition-colors">Digital =</a></li>
                 <li><a href="#" class="hover:text-blue-400 transition-colors">UMKM</a></li>
                 <li><a href="#" class="hover:text-blue-400 transition-colors">Pendidikan</a></li>
               </ul>

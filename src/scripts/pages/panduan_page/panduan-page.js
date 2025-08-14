@@ -4,18 +4,69 @@ import { LogbookPresenter } from "./logbook-presenter";
 export default class LogbookPage {
   constructor() {
     this.presenter = new LogbookPresenter(this);
+    // Load pagination state dari memory atau set default
+    const savedPagination = this.loadPaginationState();
     this.postsData = {
       posts: [],
       pagination: {
-        currentPage: 1,
-        totalPages: 1,
-        totalPosts: 0,
-        hasNext: false,
-        hasPrev: false,
+        currentPage: savedPagination.currentPage || 1,
+        totalPages: savedPagination.totalPages || 1,
+        totalPosts: savedPagination.totalPosts || 0,
+        hasNext: savedPagination.hasNext || false,
+        hasPrev: savedPagination.hasPrev || false,
       },
     };
-    // Array untuk menyimpan foto yang dipilih sementara
     this.selectedPhotos = [];
+  }
+
+  savePaginationState() {
+    try {
+      const state = {
+        currentPage: this.postsData.pagination.currentPage,
+        totalPages: this.postsData.pagination.totalPages,
+        totalPosts: this.postsData.pagination.totalPosts,
+        hasNext: this.postsData.pagination.hasNext,
+        hasPrev: this.postsData.pagination.hasPrev,
+        timestamp: Date.now(),
+      };
+
+      // Untuk environment yang mendukung localStorage
+      localStorage.setItem("logbookPaginationState", JSON.stringify(state));
+    } catch (error) {
+      console.warn("Failed to save pagination state:", error);
+    }
+  }
+
+  loadPaginationState() {
+    try {
+      // Untuk environment yang mendukung localStorage
+      const saved = JSON.parse(localStorage.getItem("logbookPaginationState"));
+
+      if (saved) {
+        // Check if state is not too old (optional - 1 hour)
+        const oneHour = 60 * 60 * 1000;
+        if (Date.now() - saved.timestamp < oneHour) {
+          return {
+            currentPage: saved.currentPage || 1,
+            totalPages: saved.totalPages || 1,
+            totalPosts: saved.totalPosts || 0,
+            hasNext: saved.hasNext || false,
+            hasPrev: saved.hasPrev || false,
+          };
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to load pagination state:", error);
+    }
+
+    // Return default state if no saved state
+    return {
+      currentPage: 1,
+      totalPages: 1,
+      totalPosts: 0,
+      hasNext: false,
+      hasPrev: false,
+    };
   }
 
   // Add this function near the top of the class, after the constructor
@@ -43,12 +94,184 @@ export default class LogbookPage {
     return withLineBreaks;
   }
 
-  limitContentLines(content, maxLines = 7) {
-    const lines = content.split("\n");
+  limitContentLines(content, maxLines = 8) {
+    if (!content || typeof content !== "string") {
+      return {
+        visibleContent: "",
+        isTruncated: false,
+      };
+    }
+
+    // Normalize line breaks - convert \r\n and \r to \n
+    const normalizedContent = content
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .trim();
+
+    // Handle empty content
+    if (!normalizedContent) {
+      return {
+        visibleContent: "",
+        isTruncated: false,
+      };
+    }
+
+    // Split by newlines and filter out excessive empty lines
+    let lines = normalizedContent.split("\n");
+
+    // Replace multiple consecutive empty lines with single empty line
+    const processedLines = [];
+    let consecutiveEmptyLines = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (line === "") {
+        consecutiveEmptyLines++;
+        // Only allow max 2 consecutive empty lines
+        if (consecutiveEmptyLines <= 2) {
+          processedLines.push("");
+        }
+      } else {
+        consecutiveEmptyLines = 0;
+        processedLines.push(lines[i]); // Keep original line with spaces
+      }
+    }
+
+    lines = processedLines;
+
+    // Check if truncation is needed
     const isTruncated = lines.length > maxLines;
-    const visibleContent = lines.slice(0, maxLines).join("\n");
+
+    if (!isTruncated) {
+      return {
+        visibleContent: lines.join("\n"),
+        isTruncated: false,
+      };
+    }
+
+    // Get exactly maxLines lines
+    const visibleLines = lines.slice(0, maxLines);
+
+    // If the last visible line is very long, truncate it gracefully
+    const lastLineIndex = visibleLines.length - 1;
+    const lastLine = visibleLines[lastLineIndex];
+
+    if (lastLine && lastLine.length > 200) {
+      // Find last complete word before 200 characters
+      const truncatedLine = lastLine.substring(0, 200);
+      const lastSpaceIndex = truncatedLine.lastIndexOf(" ");
+
+      if (lastSpaceIndex > 150) {
+        visibleLines[lastLineIndex] =
+          truncatedLine.substring(0, lastSpaceIndex) + "...";
+      } else {
+        visibleLines[lastLineIndex] = truncatedLine + "...";
+      }
+    }
+
     return {
-      visibleContent,
+      visibleContent: visibleLines.join("\n"),
+      isTruncated: true,
+    };
+  }
+
+  calculateVisualLines(content) {
+    if (!content) return 0;
+
+    // Estimasi: setiap 80 karakter = 1 baris visual (tergantung lebar container)
+    const averageCharsPerLine = 80;
+    const lines = content.split("\n");
+
+    let totalVisualLines = 0;
+
+    lines.forEach((line) => {
+      if (line.length === 0) {
+        totalVisualLines += 1; // Empty line
+      } else {
+        // Calculate how many visual lines this text line will take
+        const visualLinesForThisLine = Math.ceil(
+          line.length / averageCharsPerLine
+        );
+        totalVisualLines += Math.max(1, visualLinesForThisLine);
+      }
+    });
+
+    return totalVisualLines;
+  }
+
+  // Perbaiki method limitContentLines dengan visual line calculation
+  limitContentLinesVisual(content, maxVisualLines = 7) {
+    if (!content || typeof content !== "string") {
+      return {
+        visibleContent: "",
+        isTruncated: false,
+      };
+    }
+
+    // Normalize line breaks
+    const normalizedContent = content
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n");
+    const lines = normalizedContent.split("\n");
+
+    if (lines.length === 0) {
+      return {
+        visibleContent: "",
+        isTruncated: false,
+      };
+    }
+
+    const averageCharsPerLine = 80;
+    let currentVisualLines = 0;
+    let visibleLines = [];
+    let isTruncated = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Calculate visual lines for this text line
+      const lineVisualLines =
+        line.length === 0
+          ? 1
+          : Math.max(1, Math.ceil(line.length / averageCharsPerLine));
+
+      // Check if adding this line would exceed the limit
+      if (currentVisualLines + lineVisualLines > maxVisualLines) {
+        isTruncated = true;
+
+        // Try to fit partial line if there's remaining space
+        const remainingLines = maxVisualLines - currentVisualLines;
+        if (remainingLines > 0 && line.length > 0) {
+          // Calculate how many characters can fit in remaining space
+          const maxCharsForRemainingSpace =
+            remainingLines * averageCharsPerLine;
+          if (maxCharsForRemainingSpace > 50) {
+            // Only if meaningful content can fit
+            const truncatedLine = line.substring(
+              0,
+              maxCharsForRemainingSpace - 3
+            );
+            const lastSpaceIndex = truncatedLine.lastIndexOf(" ");
+
+            if (lastSpaceIndex > 30) {
+              visibleLines.push(
+                truncatedLine.substring(0, lastSpaceIndex) + "..."
+              );
+            } else {
+              visibleLines.push(truncatedLine + "...");
+            }
+          }
+        }
+        break;
+      }
+
+      visibleLines.push(line);
+      currentVisualLines += lineVisualLines;
+    }
+
+    return {
+      visibleContent: visibleLines.join("\n"),
       isTruncated,
     };
   }
@@ -225,8 +448,14 @@ export default class LogbookPage {
     return this.selectedPhotos;
   }
 
+  escapeHtml(text) {
+    if (!text) return "";
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   createPostElement(post) {
-    // Limit tampilan foto maksimal 3
     const maxDisplayPhotos = 3;
     const totalPhotos = post.images ? post.images.length : 0;
     const displayPhotos = post.images
@@ -235,12 +464,16 @@ export default class LogbookPage {
     const remainingPhotos =
       totalPhotos > maxDisplayPhotos ? totalPhotos - maxDisplayPhotos : 0;
 
+    // Gunakan maksimal 8 baris untuk tampilan awal
     const { visibleContent, isTruncated } = this.limitContentLines(
-      post.content
+      post.content,
+      8
     );
 
+    const contentId = `post-content-${post.id}`;
+
     return `
-      <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 post-item" data-id="${
+      <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 pr-8 post-item" data-id="${
         post.id
       }">
         <div class="flex items-start space-x-4">
@@ -267,16 +500,28 @@ export default class LogbookPage {
                 </svg>
               </button>
             </div>
-          <p class="mt-3 text-gray-700 post-content" data-full-content="${encodeURIComponent(
-            post.content
-          )}">
-            ${this.convertMarkdown(visibleContent)}
-            ${
-              isTruncated
-                ? `<span class="text-blue-600 cursor-pointer read-more-btn">Baca Selengkapnya</span>`
-                : ""
-            }
-          </p>
+            
+            <!-- Content dengan batasan 8 baris visual -->
+            <div id="${contentId}" 
+                 class="mt-3 text-gray-700 prose prose-sm text-justify post-content" 
+                 data-post-id="${post.id}"
+                 data-full-content="${this.escapeHtml(post.content)}"
+                 data-visible-content="${this.escapeHtml(visibleContent)}"
+                 data-is-expanded="false">
+              ${this.convertMarkdown(visibleContent)}
+              ${
+                isTruncated
+                  ? `
+                <span class="text-blue-600 cursor-pointer hover:text-blue-800 font-medium ml-2 read-more-btn" 
+                      data-target="${contentId}" 
+                      data-action="expand">
+                  Baca Selengkapnya
+                </span>
+              `
+                  : ""
+              }
+            </div>
+  
             ${
               totalPhotos > 0
                 ? `
@@ -323,7 +568,6 @@ export default class LogbookPage {
       </div>
     `;
   }
-
   // Method untuk membuat modal photo viewer
   createPhotoModal() {
     const modalHTML = `
@@ -564,7 +808,10 @@ export default class LogbookPage {
   }
 
   async render() {
-    await this.presenter.loadPosts();
+    // Load posts dengan current page dari saved state
+    const savedState = this.loadPaginationState();
+    await this.presenter.loadPosts(savedState.currentPage);
+
     return `
       <section class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 logbook-container">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -583,11 +830,11 @@ export default class LogbookPage {
                       </svg>
                       Logbook
                     </a>
-                    <a href="#/program" class="flex items-center px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
-                      <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <a href="#/logbook-individu" class="flex items-center px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg font-medium transition-colors">
+                       <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                       </svg>
-                      Program
+                      Logbook Individu
                     </a>
                   </nav>
                 </div>
@@ -687,7 +934,7 @@ export default class LogbookPage {
               }
             </div>
 
-            <!-- Right Sidebar - University Info -->
+             <!-- Right Sidebar - University Info -->
             <div class="xl:w-64 shrink-0 order-first xl:order-last">
               <div class="bg-white rounded-xl shadow-lg border border-gray-100 sticky top-8">
                 <div class="p-6">
@@ -697,41 +944,39 @@ export default class LogbookPage {
                         <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
                       </svg>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900">UIN Sunan Gunung Djati</h3>
+                    <h3 class="text-lg font-bold text-gray-900">KKN SISDAMAS 308</h3>
                     <p class="text-sm text-gray-600">Bandung</p>
                   </div>
 
                   <div class="space-y-4 text-sm text-gray-600">
                     <div>
-                      <h4 class="font-semibold text-gray-800 mb-2">About University</h4>
+                      <h4 class="font-semibold text-gray-800 mb-2">Program KKN</h4>
                       <p class="leading-relaxed">
-                        Universitas Islam Negeri Sunan Gunung Djati Bandung is a leading Islamic university committed to excellence in education, research, and community service.
+                        “KKN Sisdamas” adalah singkatan dari Kuliah Kerja Nyata Mahasiswa Berbasis Pemberdayaan Masyarakat, sebuah model pelaksanaan KKN yang dikembangkan oleh UIN Sunan Gunung Djati Bandung.
                       </p>
                     </div>
 
                     <div>
-                      <h4 class="font-semibold text-gray-800 mb-2">Campus Location</h4>
+                      <h4 class="font-semibold text-gray-800 mb-2">Lokasi KKN</h4>
                       <p class="leading-relaxed">
-                        Jl. A.H. Nasution No. 105<br>
-                        Cipadung, Cibiru<br>
-                        Kota Bandung, Jawa Barat
+                        Desa Gudang<br>
+                        Kecamatan Tanjungsari<br>
+                        Kabupaten Sumedang, Jawa Barat
                       </p>
                     </div>
 
                     <div>
-                      <h4 class="font-semibold text-gray-800 mb-2">Quick Links</h4>
-                      <div class="space-y-2">
-                        <a href="#" class="block text-indigo-600 hover:text-indigo-800 transition-colors">Academic Portal</a>
-                        <a href="#" class="block text-indigo-600 hover:text-indigo-800 transition-colors">Student Services</a>
-                        <a href="#" class="block text-indigo-600 hover:text-indigo-800 transition-colors">Library</a>
-                        <a href="#" class="block text-indigo-600 hover:text-indigo-800 transition-colors">Research Center</a>
-                      </div>
+                      <h4 class="font-semibold text-gray-800 mb-2">Periode</h4>
+                      <p class="leading-relaxed">
+                        Juli - Agustus 2024<br>
+                        (40 Hari Kerja)
+                      </p>
                     </div>
 
                     <div class="pt-4 border-t border-gray-200">
                       <p class="text-xs text-gray-500 leading-relaxed">
-                        © 2024 UIN Sunan Gunung Djati Bandung<br>
-                        All rights reserved
+                        © 2024 Tim KKN UIN SGD<br>
+                        Kelompok 308 - Tanjungsari
                       </p>
                     </div>
                   </div>
@@ -752,19 +997,79 @@ export default class LogbookPage {
       this.setupPhotoPreviewListeners();
       this.setupPhotoModalListeners();
 
-      // Fixed read more functionality
-      document.querySelectorAll(".read-more-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const contentElement = e.target.closest(".post-content");
-          const fullContent = decodeURIComponent(
-            contentElement.getAttribute("data-full-content")
-          );
-          contentElement.innerHTML = this.convertMarkdown(fullContent);
-        });
-      });
+      // Perbaiki read more functionality dengan event delegation dan state management
+      this.setupReadMoreListeners();
     }, 200);
   }
 
+  setupReadMoreListeners() {
+    // Hapus listener lama jika ada
+    if (this.readMoreHandler) {
+      document.removeEventListener("click", this.readMoreHandler);
+    }
+
+    // Event delegation untuk read more buttons
+    this.readMoreHandler = (e) => {
+      const readMoreBtn = e.target.closest(".read-more-btn");
+      if (!readMoreBtn) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const targetId = readMoreBtn.getAttribute("data-target");
+      const action = readMoreBtn.getAttribute("data-action");
+      const contentElement = document.getElementById(targetId);
+
+      if (!contentElement) {
+        console.error("Content element not found:", targetId);
+        return;
+      }
+
+      const postId = contentElement.getAttribute("data-post-id");
+      const fullContent = contentElement.getAttribute("data-full-content");
+      const visibleContent = contentElement.getAttribute(
+        "data-visible-content"
+      );
+      const isExpanded =
+        contentElement.getAttribute("data-is-expanded") === "true";
+
+      try {
+        if (action === "expand" && !isExpanded) {
+          // Expand content
+          contentElement.innerHTML =
+            this.convertMarkdown(fullContent) +
+            `
+            <span class="text-blue-600 cursor-pointer hover:text-blue-800 font-medium ml-2 read-more-btn" 
+                  data-target="${targetId}" 
+                  data-action="collapse">
+              Tutup
+            </span>
+          `;
+          contentElement.setAttribute("data-is-expanded", "true");
+        } else if (action === "collapse" && isExpanded) {
+          // Collapse content
+          contentElement.innerHTML =
+            this.convertMarkdown(visibleContent) +
+            `
+            <span class="text-blue-600 cursor-pointer hover:text-blue-800 font-medium ml-2 read-more-btn" 
+                  data-target="${targetId}" 
+                  data-action="expand">
+              Baca Selengkapnya
+            </span>
+          `;
+          contentElement.setAttribute("data-is-expanded", "false");
+        }
+      } catch (error) {
+        console.error("Error handling read more action:", error);
+      }
+    };
+
+    // Add event listener dengan delegation
+    document.addEventListener("click", this.readMoreHandler, {
+      passive: false,
+    });
+    console.log("Read more listeners setup completed");
+  }
   // Setup event listeners untuk photo preview
   setupPhotoPreviewListeners() {
     // Hapus event listeners yang mungkin sudah ada sebelumnya
@@ -905,6 +1210,14 @@ export default class LogbookPage {
 
     // Update pagination if exists
     this.updatePaginationDisplay();
+
+    // Save pagination state setelah update
+    this.savePaginationState();
+
+    // Re-setup read more listeners setelah DOM update
+    setTimeout(() => {
+      this.setupReadMoreListeners();
+    }, 100);
   }
 
   updatePaginationDisplay() {

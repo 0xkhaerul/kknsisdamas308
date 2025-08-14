@@ -61,7 +61,7 @@ export async function createPost({ content, files }) {
     // Handle multiple files
     if (files && files.length > 0) {
       files.forEach((file) => {
-        formData.append("files", file); // Sesuai dengan API yang mengharapkan 'files'
+        formData.append("files", file);
       });
     }
 

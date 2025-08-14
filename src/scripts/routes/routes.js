@@ -32,7 +32,7 @@ const routes = {
   "/": createPublicRoute(LandingPage),
   "/bacaan": createPublicRoute(BacaanPage),
   "/logbook": createPublicRoute(LogbookPage),
-  "/program": createPublicRoute(ProgramPage),
+  "/logbook-individu": createPublicRoute(ProgramPage),
   "/profile": createProtectedRoute(ProfilePage),
   "/login": createUnauthenticatedRoute(LoginPage),
   "/register": createUnauthenticatedRoute(RegisterPage),
