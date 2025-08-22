@@ -189,14 +189,14 @@ export default class LandingPage {
               Dosen Pembimbing Lapangan
             </h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-              Suara dari masyarakat dan mahasiswa yang telah merasakan manfaat program KKN
+             
             </p>
           </div>
 
           <!-- Foto di tengah -->
           <div class="flex justify-center items-center">
             <img 
-              src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+              src="https://ik.imagekit.io/fs0yie8l6/kkn/Yuk%20Kenalan%20Sama%20Pembimbing%20Keren%20Kami!Selama%20KKN%20di%20Desa%20Gudang%20nanti,%20kami%20nggak%20sendirian,%20g.webp?updatedAt=1755183155807" 
               alt="Foto DPL" 
               class="rounded-2xl shadow-lg w-100 h-100 object-cover"
             >
@@ -212,7 +212,7 @@ export default class LandingPage {
           <div class="text-center mb-16">
             <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Anggota</h2>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-              Suara dari masyarakat dan mahasiswa yang telah merasakan manfaat program KKN
+             
             </p>
           </div>
 
